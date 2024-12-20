@@ -8,21 +8,71 @@
 import Foundation
 
 public extension CustomStringConvertible {
+    
+    /// Writes the textual representations of the item into the standard
+    /// output.
     func printed() -> Self {
         print(self)
         return self
     }
 }
 
+/// Writes a newline character into the standard output.
 public func printIndex() {
     print("\n")
 }
 
+/// Writes the line number into the standard output.
 public func printLine(_ line: Int = #line) {
     print(line)
 }
 
+/// Writes the textual representations of the given items into the standard
+/// output.
+///
+/// You can pass zero or more items to the `print(_:separator:terminator:)`
+/// function. The textual representation for each item is the same as that
+/// obtained by calling `String(item)`. The following example prints a string,
+/// a closed range of integers, and a group of floating-point values to
+/// standard output:
+///
+///     print("One two three four five")
+///     // Prints "One two three four five"
+///
+///     print(1...5)
+///     // Prints "1...5"
+///
+///     print(1.0, 2.0, 3.0, 4.0, 5.0)
+///     // Prints "1.0 2.0 3.0 4.0 5.0"
+///
+/// To print the items separated by something other than a space, pass a string
+/// as `separator`.
+///
+///     print(1.0, 2.0, 3.0, 4.0, 5.0, separator: " ... ")
+///     // Prints "1.0 ... 2.0 ... 3.0 ... 4.0 ... 5.0"
+///
+/// The output from each call to `print(_:separator:terminator:)` includes a
+/// newline by default. To print the items without a trailing newline, pass an
+/// empty string as `terminator`.
+///
+///     for n in 1...5 {
+///         print(n, terminator: "")
+///     }
+///     // Prints "12345"
+///
+/// - Parameters:
+///   - items: Zero or more items to print.
+///   - separator: A string to print between each item. The default is a single
+///     space (`" "`).
+///   - terminator: The string to print after all items have been printed. The
+///     default is a newline (`"\n"`).
 
+/// Writes the textual representations of the given items into the standard
+/// output as the following format.
+/// The separator is a comma and a space.
+/// The terminator is a newline.
+/// - Parameters:
+///  - items: Zero or more items to print.
 public func HMPrint(_ items: Any...) {
     var initial = true
     for item in items {
@@ -41,28 +91,71 @@ public func HMPrint(_ items: Any...) {
     print("")
 }
 
+/// Side is a type that represents the four sides of a rectangle.
+/// - right: The right side of a rectangle.
+/// - up: The up side of a rectangle.
+/// - left: The left side of a rectangle.
+/// - low: The low side of a rectangle.
 public enum Side {
     case right,up,left,low
 }
 
+/// Place is a type that represents the ten places of a rectangle.
+/// - previous: The previous place of a rectangle.
+/// - center: The center of a rectangle.
+/// - upperRight: The upper right of a rectangle.
+/// - up: The up of a rectangle.
+/// - upperLeft: The upper left of a rectangle.
+/// - Left: The left of a rectangle.
+/// - lowerLeft: The lower left of a rectangle.
+/// - low: The low of a rectangle.
+/// - lowerRight: The lower right of a rectangle.
+/// - inner: The inner of a rectangle.
+/// - next: The next place of a rectangle.
+///
+/// The following figure shows the places in a rectangle.
+/// ```
+/// upperLeft     up     upperRight
+/// Left        center
+/// lowerLeft     low    lowerRight
+/// ```
+///
+/// The following figure shows the places of a rectangle.
+/// ```
+///           ┌─────────┐
+/// previous  │  inner  │      next
+///           └─────────┘
+/// ```
 public enum Place: Int {
     case previous,center,upperRight,up,upperLeft,Left,lowerLeft,low,lowerRight,inner,next
 }
 
 public extension ArraySlice {
     
+    /// Copy the array slice to an array.
+    /// - Returns: An array that copied the array slice.
+    /// - Complexity: O(*n*), where *n* is the length of the array slice.
+    /// - Note: The array slice is independent of the array.
     func independentized() -> Array<Element> {
         return self.map { $0 }
     }
 }
 
 public extension Character {
+    
+    /// Returns a boolean value indicating whether the character is a hiragana.
+    /// - Returns: `true` if the character is a hiragana; otherwise, `false`.
+    /// - SeeAlso: [Unicode.org](https://unicode.org/charts/PDF/U3040.pdf)
     var isHiragana: Bool {
         return 0x3040...0x309f ~= self.unicodeScalars.first!.value//なんか汚い
     }
 }
 
 public extension StringProtocol {
+    
+    /// Returns a string with hiragana converted to katakana.
+    /// - Returns: A string with hiragana converted to katakana.
+    /// - SeeAlso: [Unicode.org](https://unicode.org/charts/PDF/U30A0.pdf)
     var katakanalized: String {
         let mapped = self.map { (character: Character) -> String in
             if character.isHiragana {
@@ -77,21 +170,37 @@ public extension StringProtocol {
     }
 }
 
-
+/// \*\* is a power operator.
 infix operator **: PowerPrecedence//publicいらない
+
+/// **PowerPrecedence** is a precedence group that represents the power operator.
 precedencegroup PowerPrecedence {//publicいらない
     higherThan: MultiplicationPrecedence
     lowerThan: BitwiseShiftPrecedence
     associativity: right
 }
 
+/// \*\*= is a power assignment operator.
 infix operator **=: AssignmentPrecedence
 
+/// **Powerable** is a protocol that represents the power operation.
+/// - Note: The power operation is defined in [Wikipedia](https://en.wikipedia.org/wiki/Exponentiation)
 public protocol Powerable {
+    
+    /// Returns the result of the power operation.
+    /// - Parameters:
+    ///  - radix: The base number.
+    ///  - power: The exponent.
+    /// - Returns: The result of the power operation.
     static func ** (_: Self, _: Self) -> Self
 }
 
 public extension Powerable {
+    
+    /// Assigns the result of the power operation to the left operand.
+    /// - Parameters:
+    /// - lhs: The left operand.
+    /// - rhs: The right operand.
     static func **= (lhs: inout Self, rhs: Self) {
         lhs = lhs ** rhs
     }
@@ -129,6 +238,10 @@ extension Float80: Powerable {
 #endif
 
 public extension Array {
+    
+    /// Writes the textual representations of the array elements into the standard output.
+    /// The separator is a newline.
+    /// The terminator is a newline.
     func printEach() {
         for one in self {
             print(one)
@@ -140,6 +253,15 @@ public extension Array {
 
 //MARK: system
 #if os(macOS)
+
+/// Executes the given shell command.
+/// - Parameters:
+/// - body: The shell command.
+/// - Throws: An error if the shell command is invalid.
+/// - Note: The shell command is written to a temporary file.
+/// The temporary file is executed by the shell.
+/// The standard output and the standard error are written to the standard output.
+/// - SeeAlso: [Wikipedia](https://en.wikipedia.org/wiki/Shell_script)
 public func system(_ body: String) throws {
     let process = Process()
     let transProcess = Process()
@@ -185,6 +307,12 @@ public func system(_ body: String) throws {
 #endif
 
 public extension Bundle {
+    
+    /// Returns the value associated with the specified key in the localized or normal information dictionary.
+    /// - Parameters:
+    /// - key: The key in the information dictionary.
+    /// - Returns: The value associated with the key in the localized or normal information dictionary.
+    /// - Note: The localized information dictionary is preferred.
     func getValueFromLocalizedOrNormalInfoDictionary<T>(ofKey key: String, as type: T.Type) -> T? {
         if let it = localizedInfoDictionary {
             if let value = it[key] {
